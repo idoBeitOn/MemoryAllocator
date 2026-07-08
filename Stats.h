@@ -1,7 +1,8 @@
 #include <stdint.h>
+#include <stdbool.h>
 typedef struct AllocatorStats
 {
-    int magicalBytes;
+    uint8_t magicalBytes;
     bool isLocked;
     uint16_t numOfPages;
     uint32_t numOfBlocks;
