@@ -4,7 +4,7 @@
 
 typedef struct Allocator
 {
-    uint8_t* heapStart;
+    uint8_t* heapStart;//Stores the address of the beginning of the heap.
     BlockHeader* firstBlock;
     AllocatorStats stats;
 } Allocator;
