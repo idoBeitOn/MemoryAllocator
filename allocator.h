@@ -13,3 +13,9 @@ typedef struct Allocator
 
 void* my_malloc(size_t size);
 void my_free(void* ptr);
+
+
+void* generateMemoryBlock(size_t size);
+AllocatorStats* getStats();
+void findSpaceAndAdd(size_t size, BlockHeader** block, BlockHeader** smallestBlock, BlockHeader** lastBlock);
+

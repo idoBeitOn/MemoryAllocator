@@ -37,8 +37,58 @@ void* my_malloc(size_t size)
 
     }
 
-
+    return generateMemoryBlock(size);
 
 }
 
+void* generateMemoryBlock(size_t size)
+{
+    AllocatorStats* stats = getStats();
+    while(stats->isLocked == true)//If the allocator is locked, wait until it is unlocked.
+    {
+        sleep(1);
+    }
 
+    stats->isLocked = true;//Lock the allocator to prevent other threads from accessing it.
+    BlockHeader* block;
+    BlockHeader* smallestBlock;
+    BlockHeader* lastBlock;
+    findSpaceAndAdd(size, &block, &smallestBlock, &lastBlock);//finds the smallest free block that can fit the requested size and adds it to the list of allocated blocks.
+    if(smallestBlock == NULL)
+    {
+        
+    }
+
+    
+}
+
+
+AllocatorStats* getStats()
+{
+    assert(allocator.heapStart != NULL);//Ensure that the heap has been initialized.
+    AllocatorStats* stats = (AllocatorStats*)(allocator.heapStart);
+    assert(stats->magicalBytes == MAGIC_BYTE);//Ensure that the magic byte is present, indicating a valid allocator.
+    return stats;
+}
+
+void findSpaceAndAdd(size_t size, BlockHeader** block, BlockHeader** smallestBlock, BlockHeader** lastBlock)
+{
+    *block = (BlockHeader*)((char*)allocator.heapStart + sizeof(AllocatorStats));
+    *smallestBlock = NULL;
+    *lastBlock = *block;
+    while(*block != NULL)
+    {
+        assert((*block)->marker == BLOCK_MARKER);//Ensure that the block is valid.
+        //Might need to delete sizeof(BlockHeader) from the condition below, since the block length already includes the size of the header.
+        if(((*block)->length + sizeof(BlockHeader) >= size) && ((*block)->inUse == false))//If the block is free and can fit the requested size
+        {
+            if(*smallestBlock == NULL || (*smallestBlock)->length > (*block)->length)//If this is the first suitable block found or it is smaller than the current smallest block
+            {
+                *smallestBlock = *block;//Update the smallest block found.
+            }
+        }
+
+        *lastBlock = *block;//Update the last block to the current block.
+        *block = (*block)->next;//Move to the next block in the list.
+    }
+}
