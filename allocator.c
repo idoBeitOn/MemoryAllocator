@@ -69,7 +69,19 @@ void* generateMemoryBlock(size_t size)
         smallestBlock->inUse = true;//Mark the block as in use.
     }
 
-    
+    int mustHaveSize = calculateMustHaveSize(size, smallestBlock, stats, lastBlock);//Calculate the minimum size that the block must have to fit the requested size.
+    int remainingSize = mustHaveSize + 1;
+    allocator.stats.numOfBlocks++;//Update the number of blocks in the allocator stats.
+    BlockHeader* newBlock = initializeNewBlock(smallestBlock, size, remainingSize);//Generate a new block of memory for the user.
+    allocator.stats.isLocked = false;//Unlock the allocator to allow other threads to access it.
+    return (int*)((char*)newBlock + sizeof(BlockHeader));//Return a pointer to the memory after the header for user use.
+
+
+
+
+
+
+
   
 }
 
@@ -102,4 +114,49 @@ void findSpaceAndAdd(size_t size, BlockHeader** block, BlockHeader** smallestBlo
         *lastBlock = *block;//Update the last block to the current block.
         *block = (*block)->next;//Move to the next block in the list.
     }
+}
+
+BlockHeader* findLastBlock()
+{
+    AllocatorStats* stats = getStats();
+    BlockHeader* block = (BlockHeader*)((char*)allocator.heapStart + sizeof(AllocatorStats));
+    BlockHeader* lastBlock = block;
+    while(block->next != NULL)
+    {
+        block = block->next;//Move to the next block in the list.
+    }
+
+    return block;//Return the last block found.
+}
+
+int calculateMustHaveSize(size_t size, BlockHeader* smallestBlock, AllocatorStats* stats, BlockHeader* lastBlock)
+{
+    int mustHaveSize = smallestBlock->length - size - sizeof(BlockHeader);
+    if(mustHaveSize <= 0)
+    {
+        sbrk(PAGE_SIZE);//Request one more page from the OS.
+        stats->numOfPages++;//Update the number of pages in the allocator stats.
+        lastBlock->length = lastBlock->length + PAGE_SIZE;//Update the length of the last block to include the new page.
+        mustHaveSize = smallestBlock->length - size - sizeof(BlockHeader) -1;//Recalculate the must have size after adding a new page.
+    }
+
+    return mustHaveSize;
+}
+
+BlockHeader* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int remainingSize)
+{
+    BlockHeader* newBlock = (BlockHeader*)((char*)smallestBlock + sizeof(BlockHeader) + size);//Calculate the address of the new block by adding the size of the header and the requested size to the address of the smallest block.
+    newBlock->marker = BLOCK_MARKER;//Mark the new block as valid.
+    newBlock->prev = smallestBlock;
+    newBlock->next = smallestBlock->next;//Set the next pointer of the new block to point to what was previously next of smallest block.
+   
+    if(newBlock->next != NULL)//If there is a next block after smallest block
+    {
+        (newBlock->next)->prev = newBlock;//Update its previous pointer to point to the new block.
+    }
+    smallestBlock->next = newBlock;//Update the next pointer of the smallest block to point to the new block.
+    newBlock->length = remainingSize;//Mark the new block as free.
+    smallestBlock->length = size;//Update the length of the smallest block to be just enough for the requested size.
+    
+    return ((char*)smallestBlock + sizeof(BlockHeader));//Return a pointer to the memory after the header for user use.
 }
