@@ -54,12 +54,23 @@ void* generateMemoryBlock(size_t size)
     BlockHeader* smallestBlock;
     BlockHeader* lastBlock;
     findSpaceAndAdd(size, &block, &smallestBlock, &lastBlock);//finds the smallest free block that can fit the requested size and adds it to the list of allocated blocks.
-    if(smallestBlock == NULL)
+    if(smallestBlock == NULL)//No big enough free block was found, so we need to request more memory from the OS.
     {
-        
+        BlockHeader* lastBlock = findLastBlock();//Find the last block in the list of allocated blocks.
+        while(lastBlock->length < size)//Keep requesting more memory from the OS until we have a big enough block.
+        {
+            sbrk(PAGE_SIZE);//Request one more page from the OS.
+            lastBlock->length = lastBlock->length + PAGE_SIZE;//Update the length of the last block to include the new page.
+            stats->numOfPages++;//Update the number of pages in the allocator stats.
+           
+        }
+
+        smallestBlock = lastBlock;//Set the smallest block to be the new block since it is now available for allocation.
+        smallestBlock->inUse = true;//Mark the block as in use.
     }
 
     
+  
 }
 
 
