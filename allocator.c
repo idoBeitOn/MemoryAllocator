@@ -76,13 +76,6 @@ void* generateMemoryBlock(size_t size)
     allocator.stats.isLocked = false;//Unlock the allocator to allow other threads to access it.
     return (int*)((char*)newBlock + sizeof(BlockHeader));//Return a pointer to the memory after the header for user use.
 
-
-
-
-
-
-
-  
 }
 
 
@@ -159,4 +152,66 @@ BlockHeader* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int rem
     smallestBlock->length = size;//Update the length of the smallest block to be just enough for the requested size.
     
     return ((char*)smallestBlock + sizeof(BlockHeader));//Return a pointer to the memory after the header for user use.
+}
+
+bool my_free(void* ptr)
+{
+    AllocatorStats* stats = getStats();
+    while(stats->isLocked == true)
+    {
+        sleep(1);
+    }
+
+    stats->isLocked = true;
+    BlockHeader* block = ptr - sizeof(BlockHeader);
+    if(block->marker != BLOCK_MARKER)
+    {
+        return false;//The block is not valid, so we cannot free it.
+    }
+    else
+    {
+        block->inUse = false;//Mark the block as free.
+        memset(ptr, 0, block->length);
+        if(block->next != NULL && (block->next)->inUse == false)
+        {
+            BlockHeader* notUsednextBlock = block->next;
+            if(notUsednextBlock != NULL)
+            {
+                block->next = notUsednextBlock->next;
+            }
+
+            if(notUsednextBlock->next != NULL)
+            {
+                (notUsednextBlock->next)->prev = block;
+            }
+
+            else 
+            {
+                block->next = NULL;
+            }
+
+            block->length = block->length + sizeof(BlockHeader) + notUsednextBlock->length;
+            memset((void*)notUsednextBlock, 0, sizeof(BlockHeader) + notUsednextBlock->length);
+            allocator.stats.numOfBlocks--;
+        }
+
+        if(block->prev != NULL && (block->prev)->inUse == false)
+        {
+            BlockHeader* toDeleteBlock = block;
+            block = block->prev;
+            block->length += sizeof(BlockHeader) + toDeleteBlock->length;
+            block->next = toDeleteBlock->next;
+            if(block->next != NULL)
+            {
+                block->next->prev = block;
+            }
+
+            stats->numOfBlocks--;
+        }
+
+        reduceHeapSizeIfNeeded();
+    }
+
+    stats->isLocked = false;
+    return true;
 }
