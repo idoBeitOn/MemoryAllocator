@@ -10,4 +10,17 @@ Goals:
 - It is thread-safe (it can be used from multiple threads at the same time.)
 */
 
+#include "allocator_config.h"
+#include "allocator.h"
+#include "BlockHeader.h"
+#include "test.h"
 
+
+
+int main() 
+{
+  callTest(basicTest, "Basic Malloc");
+  callTest(test_bigger_than_available_malloc, "Request more memory Malloc");
+  callTest(test_free, "Basic Free");
+  debug_log("DONE");
+}

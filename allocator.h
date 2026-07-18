@@ -12,7 +12,7 @@ typedef struct Allocator
 
 
 void* my_malloc(size_t size);
-void my_free(void* ptr);
+bool my_free(void* ptr);
 
 
 void* generateMemoryBlock(size_t size);
@@ -21,6 +21,7 @@ void findSpaceAndAdd(size_t size, BlockHeader** block, BlockHeader** smallestBlo
 BlockHeader* findLastBlock();
 int calculateMustHaveSize(size_t size, BlockHeader* smallestBlock, AllocatorStats* stats, BlockHeader* lastBlock);
 BlockHeader* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int remainingSize);
+void reduceHeapSizeIfNeeded();
 
 
 
