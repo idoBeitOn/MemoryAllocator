@@ -163,8 +163,8 @@ bool my_free(void* ptr)
     }
 
     stats->isLocked = true;
-    BlockHeader* block = ptr - sizeof(BlockHeader);
-    if(block->marker != BLOCK_MARKER)
+    BlockHeader* block = (BlockHeader*)((char*)ptr - sizeof(BlockHeader));//Calculate the address of the block header by subtracting the size of the header from the user pointer.
+    if(block->marker != BLOCK_MARKER)//Is this a valid block? If not, we cannot free it.
     {
         return false;//The block is not valid, so we cannot free it.
     }
@@ -172,9 +172,9 @@ bool my_free(void* ptr)
     {
         block->inUse = false;//Mark the block as free.
         memset(ptr, 0, block->length);
-        if(block->next != NULL && (block->next)->inUse == false)
+        if(block->next != NULL && (block->next)->inUse == false)//If the next block is free, merge it with the current block.
         {
-            BlockHeader* notUsednextBlock = block->next;
+            BlockHeader* notUsednextBlock = block->next;//Remembering the block that will disappear after the merge.
             if(notUsednextBlock != NULL)
             {
                 block->next = notUsednextBlock->next;
@@ -190,7 +190,7 @@ bool my_free(void* ptr)
                 block->next = NULL;
             }
 
-            block->length = block->length + sizeof(BlockHeader) + notUsednextBlock->length;
+            block->length = block->length + sizeof(BlockHeader) + notUsednextBlock->length;//Merge operation.
             memset((void*)notUsednextBlock, 0, sizeof(BlockHeader) + notUsednextBlock->length);
             allocator.stats.numOfBlocks--;
         }
@@ -214,4 +214,40 @@ bool my_free(void* ptr)
 
     stats->isLocked = false;
     return true;
+}
+
+void reduceHeapSizeIfNeeded()
+{
+    BlockHeader* lastBlock = findLastBlock();
+    BlockHeader* prevLastBlock = findPrevUsedBlock(lastBlock);
+    if(prevLastBlock == NULL)
+    {
+        if(lastBlock->length > PAGE_SIZE)
+        {
+            lastBlock->length -= PAGE_SIZE;
+        }
+
+        prevLastBlock = lastBlock;
+    }
+
+    void *newEnd = (char*)prevLastBlock + sizeof(BlockHeader) + prevLastBlock->length;
+    void *heapEnd = sbrk(0);
+    while((char*)newEnd < (char*)heapEnd - PAGE_SIZE)
+    {
+        sbrk(-PAGE_SIZE);
+        heapEnd = sbrk(0);
+        AllocatorStats* stats = getStats();
+        stats->numOfPages--;
+    }
+
+    if((char*)heapEnd - (char*)newEnd > sizeof(BlockHeader) + 1)
+    {
+        BlockHeader* newNotUsedBlock = (BlockHeader*)newEnd;
+        newNotUsedBlock->marker = BLOCK_MARKER;
+        newNotUsedBlock->inUse = false;
+        newNotUsedBlock->prev = prevLastBlock;
+        newNotUsedBlock->next = NULL;
+        newNotUsedBlock->length = (char*)heapEnd - (char*)newEnd - sizeof(BlockHeader);
+        prevLastBlock->next = newNotUsedBlock;
+    }
 }
