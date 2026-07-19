@@ -66,9 +66,10 @@ void* generateMemoryBlock(size_t size)
         }
 
         smallestBlock = lastBlock;//Set the smallest block to be the new block since it is now available for allocation.
-        smallestBlock->inUse = true;//Mark the block as in use.
+        
     }
-
+    
+    smallestBlock->inUse = true;//Mark the block as in use.
     int mustHaveSize = calculateMustHaveSize(size, smallestBlock, stats, lastBlock);//Calculate the minimum size that the block must have to fit the requested size.
     int remainingSize = mustHaveSize + 1;
     allocator.stats.numOfBlocks++;//Update the number of blocks in the allocator stats.
@@ -149,6 +150,7 @@ BlockHeader* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int rem
     }
     smallestBlock->next = newBlock;//Update the next pointer of the smallest block to point to the new block.
     newBlock->length = remainingSize;//Mark the new block as free.
+    newBlock->inUse = false;
     smallestBlock->length = size;//Update the length of the smallest block to be just enough for the requested size.
     
     return ((char*)smallestBlock + sizeof(BlockHeader));//Return a pointer to the memory after the header for user use.

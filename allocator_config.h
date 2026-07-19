@@ -1,3 +1,7 @@
+#ifndef ALLOCATOR_CONFIG_H
+#define BLOCKHEADER_H
+
+
 #include <stdint.h>
 #include "BlockHeader.h"
 
@@ -10,3 +14,5 @@ It defines values that the allocator logic will use everywhere.
 #define BLOCK_MARKER 0xDD
 const int FIRST_BLOCK_OFFSET = sizeof(BlockHeader);//To skip the metadata when returning a pointer to the user.
 const int PAGE_SIZE = 4096;
+
+#endif ALLOCATOR_CONFIG_H

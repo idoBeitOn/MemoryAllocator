@@ -1,3 +1,7 @@
+#ifndef stats_H
+#define stats_H
+
+
 #include <stdint.h>
 #include <stdbool.h>
 typedef struct AllocatorStats
@@ -7,3 +11,5 @@ typedef struct AllocatorStats
     uint16_t numOfPages;
     uint32_t numOfBlocks;
 } AllocatorStats;  
+
+#endif STATS_H

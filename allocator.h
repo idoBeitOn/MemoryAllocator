@@ -1,3 +1,7 @@
+#ifndef ALLOCATOR_H
+#define ALLOCAOR_H
+
+
 #include <stddef.h>
 #include "Stats.h"
 #include "BlockHeader.h"
@@ -23,5 +27,5 @@ int calculateMustHaveSize(size_t size, BlockHeader* smallestBlock, AllocatorStat
 BlockHeader* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int remainingSize);
 void reduceHeapSizeIfNeeded();
 
-
+#endif ALLOCATOR_H
 

@@ -46,7 +46,7 @@ void test_free() {
   assert(first_block->length == PAGE_SIZE - sizeof(AllocatorStats) - sizeof(BlockHeader));
 }
 
-void callTest(void* (testFunction)(), const char* message)
+void callTest(void (testFunction)(), const char* message)
 {
     pid_t pid = fork();
     if(pid == 0)

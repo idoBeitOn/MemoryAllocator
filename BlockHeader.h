@@ -1,3 +1,7 @@
+#ifndef BLOCKHEADER_H
+#define BLOCKHEADER_H
+
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -14,3 +18,6 @@ typedef struct BlockHeader
     struct BlockHeader* prev;
     struct BlockHeader* next;
 } BlockHeader;
+
+
+#endif BLOCKHEADER_H
