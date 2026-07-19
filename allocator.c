@@ -97,7 +97,8 @@ void findSpaceAndAdd(size_t size, BlockHeader** block, BlockHeader** smallestBlo
     {
         assert((*block)->marker == BLOCK_MARKER);//Ensure that the block is valid.
         //Might need to delete sizeof(BlockHeader) from the condition below, since the block length already includes the size of the header.
-        if(((*block)->length + sizeof(BlockHeader) >= size) && ((*block)->inUse == false))//If the block is free and can fit the requested size
+        //if(((*block)->length + sizeof(BlockHeader) >= size) && ((*block)->inUse == false))//If the block is free and can fit the requested size
+        if ((*block)->length >= size + sizeof(BlockHeader) + 1 && (*block)->inUse == false)
         {
             if(*smallestBlock == NULL || (*smallestBlock)->length > (*block)->length)//If this is the first suitable block found or it is smaller than the current smallest block
             {
