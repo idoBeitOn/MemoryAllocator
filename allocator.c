@@ -73,9 +73,9 @@ void* generateMemoryBlock(size_t size)
     int mustHaveSize = calculateMustHaveSize(size, smallestBlock, stats, lastBlock);//Calculate the minimum size that the block must have to fit the requested size.
     int remainingSize = mustHaveSize + 1;
     allocator.stats.numOfBlocks++;//Update the number of blocks in the allocator stats.
-    BlockHeader* newBlock = initializeNewBlock(smallestBlock, size, remainingSize);//Generate a new block of memory for the user.
+    void* userMemory = initializeNewBlock(smallestBlock, size, remainingSize);//Generate a new block of memory for the user.
     allocator.stats.isLocked = false;//Unlock the allocator to allow other threads to access it.
-    return (int*)((char*)newBlock + sizeof(BlockHeader));//Return a pointer to the memory after the header for user use.
+    return userMemory;//Return a pointer to the memory after the header for user use.
 
 }
 
@@ -153,7 +153,7 @@ void* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int remainingS
     newBlock->inUse = false;
     smallestBlock->length = size;//Update the length of the smallest block to be just enough for the requested size.
     
-    return ((char*)smallestBlock + sizeof(BlockHeader));//Return a pointer to the memory after the header for user use.
+    return (char*)smallestBlock + sizeof(BlockHeader);//Return a pointer to the memory after the header for user use.
 }
 
 bool my_free(void* ptr)
