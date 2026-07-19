@@ -44,6 +44,13 @@ The project includes tests for:
 - Basic freeing
 - Block splitting
 - Block merging
+
+Each test is implemented as a separate function and executed in its own process using `fork()`.
+
+Running each test in a child process provides two important benefits:
+
+- If a test triggers an `assert()` or crashes due to a memory error, only the child process terminates.
+- The remaining tests continue to execute, allowing the test suite to report multiple failures in a single run instead of stopping at the first error.
 ### Example output:
 Basic Malloc passed
 
