@@ -38,9 +38,13 @@ void test_free() {
   assert(second_block->marker == BLOCK_MARKER);
   assert(second_block->inUse == false);
   assert(second_block->next == NULL);
-  assert(second_block->length == PAGE_SIZE - sizeof(AllocatorStats) -
-                                     (2 * sizeof(BlockHeader)) - first_block->length);
-  my_free(first);
+  assert(second_block->length == PAGE_SIZE - sizeof(AllocatorStats) - (2 * sizeof(BlockHeader)) - first_block->length);  
+  my_free(first);                   
+  assert(first_block->marker == BLOCK_MARKER);
+  assert(first_block->next == NULL);
+  assert(first_block->length == PAGE_SIZE - sizeof(AllocatorStats) - sizeof(BlockHeader));
+
+  
   assert(first_block->marker == BLOCK_MARKER);
   assert(first_block->next == NULL);
   assert(first_block->length == PAGE_SIZE - sizeof(AllocatorStats) - sizeof(BlockHeader));

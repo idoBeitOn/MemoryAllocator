@@ -71,7 +71,10 @@ void* generateMemoryBlock(size_t size)
 
     smallestBlock->inUse = true;//Mark the block as in use.
     int mustHaveSize = calculateMustHaveSize(size, smallestBlock, stats, lastBlock);//Calculate the minimum size that the block must have to fit the requested size.
-    int remainingSize = mustHaveSize + 1;
+    int remainingSize = mustHaveSize;   //remaining size is the bytes left after:
+                                            //old block header
+                                           //requested user data
+                                          // new block header
     stats->numOfBlocks++;//Update the number of blocks in the allocator stats.
     void* userMemory = initializeNewBlock(smallestBlock, size, remainingSize);//Generate a new block of memory for the user.
     stats->isLocked = false;//Unlock the allocator to allow other threads to access it.
@@ -131,7 +134,7 @@ int calculateMustHaveSize(size_t size, BlockHeader* smallestBlock, AllocatorStat
         sbrk(PAGE_SIZE);//Request one more page from the OS.
         stats->numOfPages++;//Update the number of pages in the allocator stats.
         lastBlock->length = lastBlock->length + PAGE_SIZE;//Update the length of the last block to include the new page.
-        mustHaveSize = smallestBlock->length - size - sizeof(BlockHeader) -1;//Recalculate the must have size after adding a new page.
+        mustHaveSize = smallestBlock->length - size - sizeof(BlockHeader);//Recalculate the must have size after adding a new page.
     }
 
     return mustHaveSize;
