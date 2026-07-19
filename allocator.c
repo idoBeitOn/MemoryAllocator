@@ -113,8 +113,7 @@ void findSpaceAndAdd(size_t size, BlockHeader** block, BlockHeader** smallestBlo
 BlockHeader* findLastBlock()
 {
     AllocatorStats* stats = getStats();
-    BlockHeader* block = (BlockHeader*)((char*)allocator.heapStart + sizeof(AllocatorStats));
-    BlockHeader* lastBlock = block;
+    BlockHeader* block = (BlockHeader*)((char*)stats + sizeof(AllocatorStats));
     while(block->next != NULL)
     {
         block = block->next;//Move to the next block in the list.
@@ -218,6 +217,21 @@ bool my_free(void* ptr)
     return true;
 }
 
+BlockHeader* findPrevUsedBlock(BlockHeader *ptr)
+ {
+  BlockHeader* itr = ptr;
+  while (itr->prev != NULL)
+   {
+    itr = itr->prev;
+    if (itr->inUse == true)
+     {
+      return itr;
+     }
+  }
+
+  return NULL;
+}
+
 void reduceHeapSizeIfNeeded()
 {
     BlockHeader* lastBlock = findLastBlock();
@@ -254,17 +268,3 @@ void reduceHeapSizeIfNeeded()
     }
 }
 
-BlockHeader* findPreviousUsedBlock(BlockHeader *ptr)
- {
-  BlockHeader* itr = ptr;
-  while (itr->prev != NULL)
-   {
-    itr = itr->prev;
-    if (itr->inUse == true)
-     {
-      return itr;
-     }
-  }
-
-  return NULL;
-}

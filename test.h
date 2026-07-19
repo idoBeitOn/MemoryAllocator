@@ -1,7 +1,6 @@
 #ifndef TEST_H
 #define TEST_H
 
-
 #include "allocator.h"
 #include "allocator_config.h"
 #include "Stats.h"
@@ -10,7 +9,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-//#include <sys/wait.h>
+#include <sys/wait.h>
+
+
 void debug_log(const char *msg);
 void basicTest();
 void test_bigger_than_available_malloc();

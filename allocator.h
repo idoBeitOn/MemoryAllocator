@@ -28,7 +28,7 @@ BlockHeader* findLastBlock();
 int calculateMustHaveSize(size_t size, BlockHeader* smallestBlock, AllocatorStats* stats, BlockHeader* lastBlock);
 void* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int remainingSize);
 void reduceHeapSizeIfNeeded();
-BlockHeader* findPrevUsedBlock(BlockHeader* block);
+BlockHeader* findPrevUsedBlock(BlockHeader* ptr);
 
 #endif 
 
