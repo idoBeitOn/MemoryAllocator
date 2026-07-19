@@ -72,9 +72,9 @@ void* generateMemoryBlock(size_t size)
     smallestBlock->inUse = true;//Mark the block as in use.
     int mustHaveSize = calculateMustHaveSize(size, smallestBlock, stats, lastBlock);//Calculate the minimum size that the block must have to fit the requested size.
     int remainingSize = mustHaveSize + 1;
-    allocator.stats.numOfBlocks++;//Update the number of blocks in the allocator stats.
+    stats->numOfBlocks++;//Update the number of blocks in the allocator stats.
     void* userMemory = initializeNewBlock(smallestBlock, size, remainingSize);//Generate a new block of memory for the user.
-    allocator.stats.isLocked = false;//Unlock the allocator to allow other threads to access it.
+    stats->isLocked = false;//Unlock the allocator to allow other threads to access it.
     return userMemory;//Return a pointer to the memory after the header for user use.
 
 }
@@ -194,7 +194,7 @@ bool my_free(void* ptr)
 
             block->length = block->length + sizeof(BlockHeader) + notUsednextBlock->length;//Merge operation.
             memset((void*)notUsednextBlock, 0, sizeof(BlockHeader) + notUsednextBlock->length);
-            allocator.stats.numOfBlocks--;
+            stats->numOfBlocks--;
         }
 
         if(block->prev != NULL && (block->prev)->inUse == false)
