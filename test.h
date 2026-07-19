@@ -7,13 +7,15 @@
 #include "Stats.h"
 #include <assert.h>
 #include <unistd.h>
-#include <stdio.h>wsl
-
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+//#include <sys/wait.h>
 void debug_log(const char *msg);
 void basicTest();
 void test_bigger_than_available_malloc();
 void test_free();
 void callTest(void (testFunction)(), const char* message);
 
-#endif TEST_H
+#endif
 

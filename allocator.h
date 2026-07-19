@@ -1,10 +1,12 @@
 #ifndef ALLOCATOR_H
-#define ALLOCAOR_H
+#define ALLOCATOR_H
 
 
 #include <stddef.h>
 #include "Stats.h"
 #include "BlockHeader.h"
+#include <assert.h>
+#include <string.h>
 
 typedef struct Allocator
 {
@@ -24,8 +26,9 @@ AllocatorStats* getStats();
 void findSpaceAndAdd(size_t size, BlockHeader** block, BlockHeader** smallestBlock, BlockHeader** lastBlock);
 BlockHeader* findLastBlock();
 int calculateMustHaveSize(size_t size, BlockHeader* smallestBlock, AllocatorStats* stats, BlockHeader* lastBlock);
-BlockHeader* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int remainingSize);
+void* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int remainingSize);
 void reduceHeapSizeIfNeeded();
+BlockHeader* findPrevUsedBlock(BlockHeader* block);
 
-#endif ALLOCATOR_H
+#endif 
 

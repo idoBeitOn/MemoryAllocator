@@ -20,4 +20,4 @@ typedef struct BlockHeader
 } BlockHeader;
 
 
-#endif BLOCKHEADER_H
+#endif 

@@ -1,5 +1,5 @@
-#ifndef stats_H
-#define stats_H
+#ifndef STATS_H
+#define STATS_H
 
 
 #include <stdint.h>
@@ -12,4 +12,4 @@ typedef struct AllocatorStats
     uint32_t numOfBlocks;
 } AllocatorStats;  
 
-#endif STATS_H
+#endif

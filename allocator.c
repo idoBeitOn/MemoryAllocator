@@ -14,7 +14,7 @@ void* my_malloc(size_t size)
         sbrk(PAGE_SIZE);//Asking OS to increase the heap size by one page.
     }
 
-    char* heapEnd = (char*)sbrk(0);//Sbrk(0) returns the current end of the heap.
+    uint8_t* heapEnd = (uint8_t*)sbrk(0);//Sbrk(0) returns the current end of the heap.
     size_t length = heapEnd - allocator.heapStart;//Calculate the length of the heap in bytes.
                                                     //Both are byte pointers
 
@@ -68,7 +68,7 @@ void* generateMemoryBlock(size_t size)
         smallestBlock = lastBlock;//Set the smallest block to be the new block since it is now available for allocation.
         
     }
-    
+
     smallestBlock->inUse = true;//Mark the block as in use.
     int mustHaveSize = calculateMustHaveSize(size, smallestBlock, stats, lastBlock);//Calculate the minimum size that the block must have to fit the requested size.
     int remainingSize = mustHaveSize + 1;
@@ -137,7 +137,7 @@ int calculateMustHaveSize(size_t size, BlockHeader* smallestBlock, AllocatorStat
     return mustHaveSize;
 }
 
-BlockHeader* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int remainingSize)
+void* initializeNewBlock(BlockHeader* smallestBlock, size_t size, int remainingSize)
 {
     BlockHeader* newBlock = (BlockHeader*)((char*)smallestBlock + sizeof(BlockHeader) + size);//Calculate the address of the new block by adding the size of the header and the requested size to the address of the smallest block.
     newBlock->marker = BLOCK_MARKER;//Mark the new block as valid.
