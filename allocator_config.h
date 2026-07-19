@@ -12,7 +12,7 @@ It defines values that the allocator logic will use everywhere.
 
 #define MAGIC_BYTE 0x55 //for debugging purposes.
 #define BLOCK_MARKER 0xDD
-const int FIRST_BLOCK_OFFSET = sizeof(BlockHeader);//To skip the metadata when returning a pointer to the user.
-const unsigned int PAGE_SIZE = 4096;
+#define FIRST_BLOCK_OFFSET sizeof(BlockHeader)
+#define PAGE_SIZE 4096U
 
 #endif

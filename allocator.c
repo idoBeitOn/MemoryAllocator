@@ -253,3 +253,18 @@ void reduceHeapSizeIfNeeded()
         prevLastBlock->next = newNotUsedBlock;
     }
 }
+
+BlockHeader* findPreviousUsedBlock(BlockHeader *ptr)
+ {
+  BlockHeader* itr = ptr;
+  while (itr->prev != NULL)
+   {
+    itr = itr->prev;
+    if (itr->inUse == true)
+     {
+      return itr;
+     }
+  }
+
+  return NULL;
+}
